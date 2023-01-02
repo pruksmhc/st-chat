@@ -33,7 +33,7 @@ def query(payload):
 	return self_ask_with_search.run(f"Question: {payload}")
 
 def get_text():
-    input_text = st.text_input("You: ","How old is Barack Obama's wife?", key="input")
+    input_text = st.text_input("You: ", key="input")
     return input_text 
 
 
