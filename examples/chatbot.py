@@ -9,19 +9,13 @@ st.set_page_config(
     page_icon=":robot:"
 )
 
-llm = OpenAI(temperature=0)
 search = SerpAPIWrapper()
-tools = [
-    Tool(
-        name="Intermediate Answer",
-        func=search.run
-    )
-]
+
 
 self_ask_with_search = initialize_agent(tools, llm, agent="self-ask-with-search", verbose=True)
 
-st.header("Streamlit Chat - Demo")
-st.markdown("[Github](https://github.com/ai-yash/st-chat)")
+st.header("Conversational Search")
+st.markdown("This app searches Google and synthesizes an answer for you. For example, you can ask it 'What school did Barack Obama's wife go to?' ")
 
 if 'generated' not in st.session_state:
     st.session_state['generated'] = []
@@ -30,7 +24,7 @@ if 'past' not in st.session_state:
     st.session_state['past'] = []
 
 def query(payload):
-	return self_ask_with_search.run(f"Question: {payload}")
+	return search.run(payload)
 
 def get_text():
     input_text = st.text_input("You: ", key="input")
