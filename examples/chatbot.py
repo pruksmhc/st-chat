@@ -1,14 +1,24 @@
 import streamlit as st
 from streamlit_chat import message
 import requests
+from langchain import LLMMathChain, HuggingFaceHub, OpenAI, SerpAPIWrapper, SQLDatabase, SQLDatabaseChain
+from langchain.agents import initialize_agent, Tool
 
 st.set_page_config(
     page_title="Streamlit Chat - Demo",
     page_icon=":robot:"
 )
 
-API_URL = "https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill"
-headers = {"Authorization": st.secrets['api_key']}
+llm = OpenAI(temperature=0)
+search = SerpAPIWrapper()
+tools = [
+    Tool(
+        name="Intermediate Answer",
+        func=search.run
+    )
+]
+
+self_ask_with_search = initialize_agent(tools, llm, agent="self-ask-with-search", verbose=True)
 
 st.header("Streamlit Chat - Demo")
 st.markdown("[Github](https://github.com/ai-yash/st-chat)")
@@ -20,8 +30,7 @@ if 'past' not in st.session_state:
     st.session_state['past'] = []
 
 def query(payload):
-	response = requests.post(API_URL, headers=headers, json=payload)
-	return response.json()
+	return self_ask_with_search.run("Question: How old is Harry Style's girlfriend?")
 
 def get_text():
     input_text = st.text_input("You: ","Hello, how are you?", key="input")
